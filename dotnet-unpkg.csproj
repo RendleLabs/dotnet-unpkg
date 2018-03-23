@@ -1,10 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Version>1.0.0-preview2</Version>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <AssemblyName>dotnet-unpkg</AssemblyName>
+    <PackageId>RendleLabs.UnpkgCli</PackageId>
+    <Description>dotnet cli extension for installing front-end packages from unpkg.com</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Preview 1</PackageReleaseNotes>
+    <Copyright>Copyright (C) 2018 RendleLabs</Copyright>
+    <PackageTags>frontend package-management</PackageTags>
+    <PackageProjectUrl>https://github.com/rendlelabs/dotnet-unpkg</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/RendleLabs/dotnet-unpkg/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/rendlelabs/dotnet-unpkg</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <DotNetCliToolReference Include="RendleLabs.UnpkgCli" Version="1.0.0-*" />
   </ItemGroup>
 </Project>

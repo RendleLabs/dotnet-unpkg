@@ -4,18 +4,38 @@ using System.Threading.Tasks;
 
 namespace dotnet_unpkg
 {
-    class Program
+    public static class Program
     {
         static async Task Main(string[] args)
         {
             if (args.Length == 0)
             {
-                Console.Error.WriteLine("Usage: unpkg add [package]");
+                Help.Empty();
+                return;
             }
 
-            if (args[0] == "add")
+            try
             {
-                await Add.Run(args.Skip(1));
+            switch (args[0])
+            {
+                case "--help":
+                case "-h":
+                    Help.Empty();
+                    return;
+                case "add":
+                    await Add.Run(args.Skip(1));
+                    break;
+                case "restore":
+                    await Restore.Run(args.Skip(1));
+                    break;
+                default:
+                    Help.Empty();
+                    break;
+            }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
             }
         }
     }

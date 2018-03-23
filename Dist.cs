@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -8,23 +9,18 @@ using Newtonsoft.Json;
 
 namespace dotnet_unpkg
 {
-    public class Dist
+    public static class Dist
     {
         private static readonly Regex EndPart = new Regex(@"\/dist\/\?meta$");
         private static readonly HttpClient Client = CreateClient();
         
         public static async Task<DistFile> Get(string package)
         {
-            var url = $"https://unpkg.com/{package}/dist/?meta";
-            var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            while (response.StatusCode == HttpStatusCode.Redirect)
-            {
-                Console.WriteLine(response.Headers.Location);
-                url = response.Headers.Location.ToString();
-                response = await Client.GetAsync(url);
-            }
+            var response = await Find(package);
+            var url = response.RequestMessage.RequestUri.AbsolutePath;
             if (response.IsSuccessStatusCode)
             {
+                Console.WriteLine($"Found {UnpkgJson.CleanVersion(url)}");
                 var json = await response.Content.ReadAsStringAsync();
                 var distFile = JsonConvert.DeserializeObject<DistFile>(json);
                 distFile.BaseUrl = EndPart.Replace(url, string.Empty);
@@ -33,6 +29,45 @@ namespace dotnet_unpkg
 
             Console.Error.WriteLine($"{url} returned status {(int)response.StatusCode}.");
             return null;
+        }
+
+        private static async Task<HttpResponseMessage> Find(string package)
+        {
+            string url;
+            if (package.Contains("/"))
+            {
+                var parts = package.Split('/');
+                url = $"{parts[0]}/dist/{string.Join('/', parts.Skip(1))}/?meta";
+            }
+            else
+            {
+                url = $"{package}/dist/?meta";
+            }
+
+            var response = await FollowRedirects(url);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return response;
+            }
+            
+            response.Dispose();
+
+            return await FollowRedirects($"{package}/?meta");
+        }
+
+        private static async Task<HttpResponseMessage> FollowRedirects(string url)
+        {
+            var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            
+            while (response.StatusCode == HttpStatusCode.Redirect)
+            {
+                url = response.Headers.Location.ToString();
+                response.Dispose();
+                response = await Client.GetAsync(url);
+            }
+
+            return response;
         }
 
         private static HttpClient CreateClient()

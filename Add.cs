@@ -4,16 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 
 namespace dotnet_unpkg
 {
-    static class UnpkgJson
-    {
-        
-    }
-
-    static class Add
+    public static class Add
     {
         private static readonly HttpClient Client = new HttpClient
         {
@@ -22,15 +16,22 @@ namespace dotnet_unpkg
         
         private static readonly string BaseDirectory = Path.Combine("wwwroot", "lib");
 
-        public static async Task<List<UnpkgJsonEntry>> Run(IEnumerable<string> args)
+        public static async Task Run(IEnumerable<string> args)
         {
+            var argList = args.ToList();
+            if (argList[0] == "--help" || argList[0] == "-h")
+            {
+                Help.Add();
+                return;
+            }
+            
             if (!Directory.Exists(BaseDirectory))
             {
                 Directory.CreateDirectory(BaseDirectory);
             }
 
-            var results = await Task.WhenAll(args.Select(AddPackage));
-            return results.ToList();
+            var results = await Task.WhenAll(argList.Select(AddPackage));
+            await UnpkgJson.Save(results);
         }
 
         private static async Task<UnpkgJsonEntry> AddPackage(string package)
@@ -41,56 +42,26 @@ namespace dotnet_unpkg
                 return null;
             }
 
-            await Download(package, distFile.BaseUrl, distFile.Files);
+            await DownloadPackage(package, distFile.BaseUrl, distFile.Files);
             return UnpkgJsonEntry.Create(package, distFile);
         }
 
-        private static Task Download(string package, string basePath, IEnumerable<DistFile> files)
+        private static Task DownloadPackage(string package, string basePath, IEnumerable<DistFile> files)
         {
             var tasks = new List<Task>();
             foreach (var file in files)
             {
                 if (file.Type == "file")
                 {
-                    tasks.Add(Download(package, basePath, file.Path));
+                    tasks.Add(Download.DistFile(package, $"{basePath}{file.Path}"));
                 }
                 else if (file.Files?.Count > 0)
                 {
-                    tasks.Add(Download(package, basePath, file.Files));
+                    tasks.Add(DownloadPackage(package, basePath, file.Files));
                 }
             }
 
             return Task.WhenAll(tasks);
-        }
-
-        private static async Task Download(string package, string basePath, string path)
-        {
-            using (var response = await Client.GetAsync($"{basePath}{path}"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    // Remove /dist/ from start of path
-                    path = path.Substring(6);
-                    
-                    if (Path.DirectorySeparatorChar != '/')
-                    {
-                        path = path.Replace('/', Path.DirectorySeparatorChar);
-                    }
-                
-                    var file = Path.GetFileName(path);
-                    var directory = Path.Combine(BaseDirectory, package, Path.GetDirectoryName(path));
-
-                    if (!Directory.Exists(directory))
-                    {
-                        Directory.CreateDirectory(directory);
-                    }
-
-                    using (var fileStream = File.Create(Path.Combine(directory, file)))
-                    {
-                        await response.Content.CopyToAsync(fileStream);
-                    }
-                }
-            }
         }
     }
 }

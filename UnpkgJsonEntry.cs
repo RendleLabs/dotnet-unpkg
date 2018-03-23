@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace dotnet_unpkg
 {
-    class UnpkgJsonEntry
+    public class UnpkgJsonEntry
     {
         public string PackageName { get; set; }
         public string Version { get; set; }
@@ -26,7 +26,7 @@ namespace dotnet_unpkg
             {
                 if (distFile.Type == "file")
                 {
-                    files.Add(new UnpkgJsonFile { Path = distFile.Path.Substring(6), Integrity = distFile.Integrity});
+                    files.Add(new UnpkgJsonFile { Path = distFile.Path, Integrity = distFile.Integrity});
                 }
                 else if (distFile.Files?.Count > 0)
                 {
