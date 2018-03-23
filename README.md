@@ -18,6 +18,8 @@ and the user's connection hasn't been compromised.
 `dotnet-unpkg` uses that metadata to discover the files in the package and download
 them right into your `wwwroot/lib` folder.
 
+Sometimes the packages don't have a `dist` folder, in which case `dotnet unpkg` will download pretty much everything.
+
 ## Usage
 
 Install the package into your project as a tool reference:
@@ -67,7 +69,13 @@ to redownload everything, and it remembers the version, too, so it won't sneakil
 upgrade you to jQuery 4.0 when you're not looking.
 
 If you can get all your `wwwroot/lib` dependencies using `unpkg`, then you can add
-it to your `.gitignore` and save checking all those files in.
+it to your `.gitignore` and save checking all those files in. Just make sure the `unpkg.json` file is checked in.
+
+Once you've got a package installed, the `restore` command will just use the info
+from `unpkg.json`, so if there are files you don't want you can edit it and remove
+them. Saving should be non-destructive. If you run `add` again for a package that
+is already in `unpkg.json`, it will be overwritten with whatever version it finds
+on the CDN.
 
 ### Integrity hashes
 
@@ -98,6 +106,6 @@ file. You should use this in your `<script>` and `<link>` tags, like this:
   asp-fallback-test-value="absolute" />
 ```
 
-**Note to self** maybe could generate these tags, either as an extra command or
+**Note to self:** maybe generate these tags, either as an extra command or
 into another file somewhere?
 
