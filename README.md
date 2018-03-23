@@ -1,6 +1,6 @@
 [nuget.org/packages/RendleLabs.UnpkgCli](https://www.nuget.org/packages/RendleLabs.UnpkgCli)
 
-# dotnet-unpkg
+# dotnet unpkg
 I got fed up of needing to have Node.js and NPM installed just so I could install
 front-end packages like jQuery and Bootstrap. I'm not using Webpack or anything,
 so I don't want 100MB of `node_modules` in every project.
