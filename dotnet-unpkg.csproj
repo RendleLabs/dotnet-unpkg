@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>1.0.0-preview2</Version>
+    <Version>1.0.0-preview3</Version>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -17,8 +17,5 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <DotNetCliToolReference Include="RendleLabs.UnpkgCli" Version="1.0.0-*" />
   </ItemGroup>
 </Project>
