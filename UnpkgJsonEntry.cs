@@ -26,7 +26,13 @@ namespace dotnet_unpkg
             {
                 if (distFile.Type == "file")
                 {
-                    files.Add(new UnpkgJsonFile { Path = distFile.Path, CdnUrl = $"https://unpkg.com/{version}{distFile.Path}", Integrity = distFile.Integrity});
+                    files.Add(new UnpkgJsonFile
+                    {
+                        Path = distFile.Path,
+                        LocalPath = distFile.LocalPath,
+                        CdnUrl = $"https://unpkg.com/{version}{distFile.Path}",
+                        Integrity = distFile.Integrity
+                    });
                 }
                 else if (distFile.Files?.Count > 0)
                 {

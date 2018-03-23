@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
@@ -53,8 +54,50 @@ namespace dotnet_unpkg
             var files = (JArray) entry["files"];
 
             return Task.WhenAll(files
-                .Select(f => f["file"].Value<string>())
-                .Select(f => Download.DistFile(package, $"{version}/{f}")));
+                .Select(f => DownloadFile(package, version, (JObject)f)));
+        }
+
+        private static Task DownloadFile(string package, string version, JObject file)
+        {
+            var local = file["local"].Value<string>();
+            if (File.Exists(local))
+            {
+                var integrity = file["integrity"].Value<string>();
+                var integrityBits = integrity.Split('-', 2);
+                if (integrityBits.Length == 2)
+                {
+                    var hashAlgorithm = GetAlgorithm(integrityBits[0]);
+                    if (hashAlgorithm != null)
+                    {
+                        using (var stream = File.OpenRead(local))
+                        {
+                            var hash = hashAlgorithm.ComputeHash(stream);
+                            if (integrityBits[1].Equals(Convert.ToBase64String(hash)))
+                            {
+                                Console.WriteLine($"{local} is up-to-date.");
+                                return Task.CompletedTask;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Download.DistFile(package, $"{version}/{file["file"].Value<string>()}");
+        }
+
+        private static HashAlgorithm GetAlgorithm(string name)
+        {
+            switch (name.ToLowerInvariant())
+            {
+                case "sha256":
+                    return SHA256.Create();
+                case "sha384":
+                    return SHA384.Create();
+                case "sha512":
+                    return SHA512.Create();
+                default:
+                    return null;
+            }
         }
     }
 }

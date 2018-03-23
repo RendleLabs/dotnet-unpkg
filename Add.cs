@@ -56,7 +56,7 @@ namespace dotnet_unpkg
             {
                 if (file.Type == "file")
                 {
-                    tasks.Add(Download.DistFile(package, $"{basePath}{file.Path}"));
+                    tasks.Add(DownloadFile(package, basePath, file));
                 }
                 else if (file.Files?.Count > 0)
                 {
@@ -65,6 +65,11 @@ namespace dotnet_unpkg
             }
 
             return Task.WhenAll(tasks);
+        }
+
+        private static async Task DownloadFile(string package, string basePath, DistFile file)
+        {
+            file.LocalPath = await Download.DistFile(package, $"{basePath}{file.Path}");
         }
     }
 }

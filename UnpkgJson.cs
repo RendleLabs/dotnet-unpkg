@@ -31,7 +31,8 @@ namespace dotnet_unpkg
                 var jEntry = new JObject
                 {
                     ["version"] = CleanVersion(entry.Version),
-                    ["files"] = JArray.FromObject(entry.Files.Select(f => new {file = f.Path, cdn = f.CdnUrl, integrity = f.Integrity}))
+                    ["files"] = JArray.FromObject(entry.Files.Select(f =>
+                        new {file = f.Path, cdn = f.CdnUrl, local = f.LocalPath, integrity = f.Integrity}))
                 };
                 file[CleanPackageName(entry.PackageName)] = jEntry;
             }

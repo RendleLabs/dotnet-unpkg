@@ -14,7 +14,7 @@ namespace dotnet_unpkg
         };
         private static readonly string BaseDirectory = Path.Combine("wwwroot", "lib");
         
-        public static async Task DistFile(string package, string path)
+        public static async Task<string> DistFile(string package, string path)
         {
             var target = TargetFile(path);
             using (var response = await Client.GetAsync(path))
@@ -29,16 +29,19 @@ namespace dotnet_unpkg
                         Directory.CreateDirectory(directory);
                     }
 
-                    using (var fileStream = File.Create(Path.Combine(directory, file)))
+                    var localPath = Path.Combine(directory, file);
+                    using (var fileStream = File.Create(localPath))
                     {
                         await response.Content.CopyToAsync(fileStream);
                     }
 
-                    Console.WriteLine($"{Path.Combine(package, target)}... OK");
+                    Console.WriteLine($"{response.RequestMessage.RequestUri}... OK");
+                    return localPath;
                 }
                 else
                 {
-                    Console.WriteLine($"{Path.Combine(package, target)}... failed ({(int)response.StatusCode}");
+                    Console.WriteLine($"{response.RequestMessage.RequestUri}... failed ({(int)response.StatusCode})");
+                    return null;
                 }
             }
         }
