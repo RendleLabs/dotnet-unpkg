@@ -16,21 +16,21 @@ namespace dotnet_unpkg
                 Version = file.BaseUrl,
                 Files = new List<UnpkgJsonFile>()
             };
-            AddFiles(entry.Files, file.Files);
+            AddFiles(entry.Files, file.BaseUrl, file.Files);
             return entry;
         }
 
-        private static void AddFiles(List<UnpkgJsonFile> files, IEnumerable<DistFile> distFiles)
+        private static void AddFiles(List<UnpkgJsonFile> files, string version, IEnumerable<DistFile> distFiles)
         {
             foreach (var distFile in distFiles)
             {
                 if (distFile.Type == "file")
                 {
-                    files.Add(new UnpkgJsonFile { Path = distFile.Path, Integrity = distFile.Integrity});
+                    files.Add(new UnpkgJsonFile { Path = distFile.Path, CdnUrl = $"https://unpkg.com/{version}{distFile.Path}", Integrity = distFile.Integrity});
                 }
                 else if (distFile.Files?.Count > 0)
                 {
-                    AddFiles(files, distFile.Files);
+                    AddFiles(files, version, distFile.Files);
                 }
             }
         }

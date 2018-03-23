@@ -4,5 +4,6 @@ namespace dotnet_unpkg
     {
         public string Path { get; set; }
         public string Integrity { get; set; }
+        public string CdnUrl { get; set; }
     }
 }

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace dotnet_unpkg
 {
     public static class Add
     {
+        private static readonly Regex DistInPath = new Regex(@"\/dist\/.*");
         private static readonly HttpClient Client = new HttpClient
         {
             BaseAddress = new Uri("https://unpkg.com")
@@ -48,6 +50,7 @@ namespace dotnet_unpkg
 
         private static Task DownloadPackage(string package, string basePath, IEnumerable<DistFile> files)
         {
+            basePath = DistInPath.Replace(basePath, string.Empty);
             var tasks = new List<Task>();
             foreach (var file in files)
             {
