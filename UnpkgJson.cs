@@ -43,7 +43,11 @@ namespace dotnet_unpkg
             }
         }
 
-        public static string CleanPackageName(string full) => full.Split('@').FirstOrDefault();
+        private static string CleanPackageName(string full)
+        {
+            var last = full.LastIndexOf('@');
+            return last > 0 ? full.Substring(0, last) : full;
+        }
 
         public static string CleanVersion(string full) => full.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
     }

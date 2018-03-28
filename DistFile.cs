@@ -14,5 +14,6 @@ namespace dotnet_unpkg
         public string Type { get; set; }
         public string Integrity { get; set; }
         public List<DistFile> Files { get; set; }
+        public string Url { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace dotnet_unpkg
                     {
                         Path = distFile.Path,
                         LocalPath = distFile.LocalPath,
-                        CdnUrl = $"https://unpkg.com/{version}{distFile.Path}",
+                        CdnUrl = distFile.Url,
                         Integrity = distFile.Integrity
                     });
                 }

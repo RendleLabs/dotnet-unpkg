@@ -44,6 +44,15 @@ namespace dotnet_unpkg
                 return null;
             }
 
+            var distDirectory = distFile.Files.FirstOrDefault(f =>
+                f.Type.Equals("directory", StringComparison.OrdinalIgnoreCase) && f.Path.Equals("/dist", StringComparison.OrdinalIgnoreCase));
+
+            if (distDirectory != null)
+            {
+                distDirectory.BaseUrl = distFile.BaseUrl;
+                distFile = distDirectory;
+            }
+
             await DownloadPackage(package, distFile.BaseUrl, distFile.Files);
             return UnpkgJsonEntry.Create(package, distFile);
         }
@@ -69,7 +78,9 @@ namespace dotnet_unpkg
 
         private static async Task DownloadFile(string package, string basePath, DistFile file)
         {
-            file.LocalPath = await Download.DistFile(package, $"{basePath}{file.Path}");
+            var (cdn, localPath) = await Download.DistFile(package, $"{basePath.TrimSlashes()}/{file.Path.TrimSlashes()}");
+            file.Url = cdn;
+            file.LocalPath = localPath.Replace(Path.DirectorySeparatorChar, '/');
         }
     }
 }

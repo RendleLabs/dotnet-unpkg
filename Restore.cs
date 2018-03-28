@@ -59,7 +59,14 @@ namespace dotnet_unpkg
 
         private static Task DownloadFile(string package, string version, JObject file)
         {
-            var local = file["local"].Value<string>();
+            var local = file["local"]?.Value<string>()?.Replace('/', Path.DirectorySeparatorChar);
+            var cdn = file["cdn"]?.Value<string>();
+            
+            if (string.IsNullOrWhiteSpace(local) || string.IsNullOrWhiteSpace(cdn))
+            {
+                Console.Error.WriteLine($"Could not restore: {file}");
+                return Task.CompletedTask;
+            }
             if (File.Exists(local))
             {
                 var integrity = file["integrity"].Value<string>();
@@ -82,7 +89,7 @@ namespace dotnet_unpkg
                 }
             }
 
-            return Download.DistFile(package, $"{version}/{file["file"].Value<string>()}");
+            return Download.RestoreDistFile(cdn, local);
         }
 
         private static HashAlgorithm GetAlgorithm(string name)
