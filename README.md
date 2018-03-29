@@ -1,4 +1,4 @@
-[nuget.org/packages/RendleLabs.UnpkgCli](https://www.nuget.org/packages/RendleLabs.UnpkgCli)
+**NuGet package: [nuget.org/packages/RendleLabs.UnpkgCli](https://www.nuget.org/packages/RendleLabs.UnpkgCli)**
 
 # dotnet unpkg
 I got fed up of needing to have Node.js and NPM installed just so I could install
@@ -57,6 +57,12 @@ Then, from the command line:
 
 ```
 $ dotnet unpkg add vue
+```
+
+It supports NPM-namespaced packages:
+
+```
+$ dotnet unpkg add @aspnet/signalr
 ```
 
 You can install multiple packages in a single command:
