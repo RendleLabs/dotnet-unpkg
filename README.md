@@ -3,9 +3,30 @@
 # dotnet unpkg
 I got fed up of needing to have Node.js and NPM installed just so I could install
 front-end packages like jQuery and Bootstrap. I'm not using Webpack or anything,
-so I don't want 100MB of `node_modules` in every project.
+and I don't want 100MB of `node_modules` in every project.
 
-So I made a dotnet command to do it instead.
+So I made a `dotnet` command to do it instead.
+
+## Why should I use it?
+
+Because you're building an ASP.NET Core application which just needs common front-end packages like
+Bootstrap, jQuery and Popper.js, and it's going to serve them from a CDN in Production but with
+fallback to local files. You're not compiling your front-end code with Webpack or anything, and you 
+just want an easy way to acquire those libraries, without needing to install Node.js and NPM or Yarn or Bower,
+and without adding a Gulp or Grunt step just to copy the files you actually need out of `node_modules`.
+
+`dotnet-unpkg` is written in C#, with no dependency on JavaScript runtimes, so it installs as a `dotnet` command
+in your project ([global tool](https://www.natemcmaster.com/blog/2018/02/02/dotnet-global-tool/) support coming soon).
+It'll grab the files you need from the same public CDN you can use for Production
+&mdash; [unpkg.com](https://unpkg.com) &mdash;
+and puts them right into `wwwroot\lib`, where they belong.
+
+## Why shouldn't I use it?
+
+If you are building a complex SPA, with Angular or TypeScript or Webpack or suchlike, and you've got code that loads packages
+from `node_modules` using `import` syntax, then this is not for those projects, and you should use [NPM](https://npmjs.com).
+(You could also use Yarn, but that's by Facebook so for all you know it might be sending copies of your dependency graphs
+to shady data-mining organisations; be careful out there.)
 
 ## How does it work?
 
