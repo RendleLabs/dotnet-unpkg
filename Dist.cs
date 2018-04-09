@@ -34,16 +34,32 @@ namespace dotnet_unpkg
         private static async Task<HttpResponseMessage> Find(string package)
         {
             string url;
-            if (package.Contains("/"))
+            var parts = package.Split('/');
+            string sub = null;
+
+            if (package.StartsWith('@') && parts.Length > 1)
             {
-                var parts = package.Split('/');
-                url = $"{parts[0]}/dist/{string.Join('/', parts.Skip(1))}/?meta";
+                package = $"{parts[0]}/{parts[1]}";
+                if (parts.Length > 2)
+                {
+                    sub = string.Join('/', parts.Skip(2));
+                }
+            }
+            else if (parts.Length > 1)
+            {
+                package = parts[0];
+                sub = string.Join('/', parts.Skip(1));
+            }
+
+            if (sub != null)
+            {
+                url = $"{package}/dist/{sub}/?meta";
             }
             else
             {
                 url = $"{package}/dist/?meta";
             }
-
+            
             var response = await FollowRedirects(url);
             
             if (response.IsSuccessStatusCode)

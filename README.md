@@ -86,6 +86,16 @@ $ dotnet unpkg add bootswatch/yeti
 That just installs the **Yeti** theme within the larger Bootswatch package. If
 you just install Bootswatch by itself, you'll get all 20-odd themes.
 
+**New in 1.2**
+
+You can now specify paths with namespaced packages. This is incredibly useful if you want to install [Rx.js](http://reactivex.io/rxjs/)
+because it's *huge*, and all you want is the `global` folder:
+
+```
+$ dotnet unpkg add @reactivex/rxjs/global
+```
+And you'll just get the four `<script>`-tag-friendly files that you need, and not the hundreds of Node and Webpack and source files.
+
 ### unpkg.json
 
 The `add` command stores the details about the files it downloaded into a file in the current directory, `unpkg.json`. Once that's there, you can just run
