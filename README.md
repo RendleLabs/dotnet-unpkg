@@ -96,6 +96,32 @@ $ dotnet unpkg add @reactivex/rxjs/global
 ```
 And you'll just get the four `<script>`-tag-friendly files that you need, and not the hundreds of Node and Webpack and source files.
 
+**New in 1.3**
+
+Add specific versions using `@` notation, e.g.
+
+```
+$ dotnet unpkg add jquery@3.3.0
+```
+
+Update to latest versions of packages with a single command:
+
+```
+$ dotnet unpkg update
+```
+
+To update specific packages just add their names, e.g.
+
+```
+$ dotnet unpkg update bootstrap
+```
+
+Aliases for commands:
+
+- `add` is also `a`
+- `restore` is also `r`
+- `update` is also `u`, `up` or `upgrade` because I can never remember which one it is
+
 ### unpkg.json
 
 The `add` command stores the details about the files it downloaded into a file in the current directory, `unpkg.json`. Once that's there, you can just run
