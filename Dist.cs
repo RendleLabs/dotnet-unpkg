@@ -20,7 +20,7 @@ namespace dotnet_unpkg
             var url = response.RequestMessage.RequestUri.AbsolutePath;
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"Found {UnpkgJson.CleanVersion(url)}");
+                Console.WriteLine($"Found {UnpkgJson.ExtractVersion(url)}");
                 var json = await response.Content.ReadAsStringAsync();
                 var distFile = JsonConvert.DeserializeObject<DistFile>(json);
                 distFile.BaseUrl = EndPart.Replace(url, string.Empty);

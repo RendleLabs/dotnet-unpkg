@@ -30,7 +30,7 @@ namespace dotnet_unpkg
             {
                 var jEntry = new JObject
                 {
-                    ["version"] = CleanVersion(entry.Version),
+                    ["version"] = ExtractVersion(entry.Version),
                     ["files"] = JArray.FromObject(entry.Files.Select(f =>
                         new {file = f.Path, cdn = f.CdnUrl, local = f.LocalPath, integrity = f.Integrity}))
                 };
@@ -49,37 +49,14 @@ namespace dotnet_unpkg
             return last > 0 ? full.Substring(0, last) : full;
         }
 
-        public static string CleanVersion(string full) => full.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-    }
-
-    public static class Help
-    {
-        public static void Empty()
+        public static string ExtractVersion(string full)
         {
-            Console.WriteLine("Usage: dotnet unpkg [command] [arguments]");
-            Console.WriteLine();
-            Console.WriteLine("Commands:");
-            Console.WriteLine("  add            Add a package");
-            Console.WriteLine("  restore        Restore packages");
-        }
-
-        public static void Add()
-        {
-            Console.WriteLine("Usage: dotnet unpkg add <PACKAGE> [...<PACKAGE>]");
-            Console.WriteLine();
-            Console.WriteLine("Arguments:");
-            Console.WriteLine("  <PACKAGE>    The name of a package on unpkg.com.");
-            Console.WriteLine();
-            Console.WriteLine("Examples:");
-            Console.WriteLine("    dotnet unpkg add jquery bootstrap popper.js");
-            Console.WriteLine("    dotnet unpkg add bootswatch/yeti");
-            Console.WriteLine();
-        }
-
-        public static void Restore()
-        {
-            Console.WriteLine("Usage: dotnet unpkg restore");
-            Console.WriteLine();
+            var parts = full.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var fileAtVersion = parts
+                .FirstOrDefault(s => s[0] != '@' && s.Contains('@'));
+            if (fileAtVersion == null) return parts[0];
+            parts = fileAtVersion.Split('@', 2, StringSplitOptions.RemoveEmptyEntries);
+            return parts[1];
         }
     }
 }
