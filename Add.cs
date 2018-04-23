@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -11,11 +10,7 @@ namespace dotnet_unpkg
     public static class Add
     {
         private static readonly Regex DistInPath = new Regex(@"\/dist\/.*");
-        private static readonly HttpClient Client = new HttpClient
-        {
-            BaseAddress = new Uri("https://unpkg.com")
-        };
-        
+
         private static readonly string BaseDirectory = Path.Combine("wwwroot", "lib");
 
         public static async Task Run(IEnumerable<string> args)
@@ -78,7 +73,14 @@ namespace dotnet_unpkg
 
         private static async Task DownloadFile(string package, string basePath, DistFile file)
         {
-            var (cdn, localPath) = await Download.DistFile(package, $"{basePath.TrimSlashes()}/{file.Path.TrimSlashes()}");
+            basePath = basePath.TrimSlashes();
+            var path = file.Path.TrimSlashes();
+            var pathSegments = path.Split('/');
+            if (basePath.Split('/').LastOrDefault() == pathSegments.FirstOrDefault())
+            {
+                path = string.Join('/', pathSegments.Skip(1));
+            }
+            var (cdn, localPath) = await Download.DistFile(package, $"{basePath}/{path}");
             file.Url = cdn;
             file.LocalPath = localPath.Replace(Path.DirectorySeparatorChar, '/');
         }

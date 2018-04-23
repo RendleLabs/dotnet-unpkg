@@ -20,10 +20,11 @@ namespace dotnet_unpkg
             var url = response.RequestMessage.RequestUri.AbsolutePath;
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"Found {UnpkgJson.ExtractVersion(url)}");
+                var version = UnpkgJson.ExtractVersion(url);
                 var json = await response.Content.ReadAsStringAsync();
                 var distFile = JsonConvert.DeserializeObject<DistFile>(json);
                 distFile.BaseUrl = EndPart.Replace(url, string.Empty);
+                distFile.Version = version;
                 return distFile;
             }
 
@@ -51,16 +52,28 @@ namespace dotnet_unpkg
                 sub = string.Join('/', parts.Skip(1));
             }
 
+            HttpResponseMessage response;
+
             if (sub != null)
             {
                 url = $"{package}/dist/{sub}/?meta";
+                response = await FollowRedirects(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    return response;
+                }
+                else
+                {
+                    response.Dispose();
+                    url = $"{package}/{sub}/?meta";
+                }
             }
             else
             {
                 url = $"{package}/dist/?meta";
             }
             
-            var response = await FollowRedirects(url);
+            response = await FollowRedirects(url);
             
             if (response.IsSuccessStatusCode)
             {

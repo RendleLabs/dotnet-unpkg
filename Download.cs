@@ -8,7 +8,7 @@ namespace dotnet_unpkg
 {
     public static class Download
     {
-        private static readonly char[] SplitChar = {'/'};
+        private static readonly char[] SplitChar = {'/', '\\'};
         private static readonly HttpClient Client = new HttpClient
         {
             BaseAddress = new Uri("https://unpkg.com")
@@ -17,7 +17,31 @@ namespace dotnet_unpkg
         
         public static async Task<(string, string)> DistFile(string package, string path)
         {
+            var packageSegments = package.Split(SplitChar, StringSplitOptions.RemoveEmptyEntries);
             var target = TargetFile(package, path);
+
+            if (packageSegments.Length > 1)
+            {
+                var targetSegments = target.Split(SplitChar, StringSplitOptions.RemoveEmptyEntries);
+                if (targetSegments.Length > 1)
+                {
+                    if (packageSegments.Last() == targetSegments.First())
+                    {
+                        target = string.Join(Path.DirectorySeparatorChar, targetSegments.Skip(1));
+                    }
+                }
+            }
+
+            for (int i = 0; i < packageSegments.Length; i++)
+            {
+                if (packageSegments[i].Contains('@') && !packageSegments[i].StartsWith('@'))
+                {
+                    packageSegments[i] = packageSegments[i].Split('@')[0];
+                }
+            }
+
+            package = string.Join('/', packageSegments);
+
             using (var response = await Client.GetAsync(path))
             {
                 if (response.IsSuccessStatusCode)
@@ -99,17 +123,10 @@ namespace dotnet_unpkg
 
                         break;
                 }
-//                return string.Join(Path.DirectorySeparatorChar,
-//                    pathParts
-//                        .SkipWhile(s => !s.Equals("dist", StringComparison.OrdinalIgnoreCase))
-//                        .Skip(1));
             }
             else
             {
                 pathParts = pathParts.Skip(1).ToArray();
-//                return string.Join(Path.DirectorySeparatorChar,
-//                    pathParts
-//                        .Skip(1));
             }
 
             return string.Join(Path.DirectorySeparatorChar, pathParts);

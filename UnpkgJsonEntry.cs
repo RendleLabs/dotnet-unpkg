@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace dotnet_unpkg
 {
+    [PublicAPI]
     public class UnpkgJsonEntry
     {
         public string PackageName { get; set; }

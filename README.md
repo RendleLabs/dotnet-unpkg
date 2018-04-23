@@ -148,3 +148,12 @@ file. You should use this in your `<script>` and `<link>` tags, like this:
 **Note to self:** maybe generate these tags, either as an extra command or
 into another file somewhere?
 
+## Open Source
+
+`dotnet-unpkg` is open source, and incorporates the work of other open source projects, specifically:
+
+- [UNPKG](https://github.com/unpkg) by Michael Jackson
+- [semver](https://github.com/maxhauser/semver) by Max Hauser
+- [JSON.NET](https://www.newtonsoft.com/json) by James Newton-King
+
+Thank you to all these creators for their contributions to the open-source ecosystem.

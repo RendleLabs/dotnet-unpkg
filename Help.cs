@@ -32,5 +32,20 @@ namespace dotnet_unpkg
             Console.WriteLine("Usage: dotnet unpkg restore");
             Console.WriteLine();
         }
+
+        public static void Upgrade()
+        {
+            Console.WriteLine("Usage: dotnet unpkg upgrade [<PACKAGE> [...<PACKAGE>]]");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  <PACKAGE>    (Optional) The name of an installed package.");
+            Console.WriteLine("               If omitted, all packages will be upgraded.");
+            Console.WriteLine();
+            Console.WriteLine("Examples:");
+            Console.WriteLine("    dotnet unpkg upgrade");
+            Console.WriteLine("    dotnet unpkg upgrade jquery bootstrap popper.js");
+            Console.WriteLine("    dotnet unpkg upgrade @aspnet/signalr/browser");
+            Console.WriteLine();
+        }
     }
 }

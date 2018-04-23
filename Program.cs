@@ -6,7 +6,7 @@ namespace dotnet_unpkg
 {
     public static class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             if (args.Length == 0)
             {
@@ -22,9 +22,17 @@ namespace dotnet_unpkg
                 case "-h":
                     Help.Empty();
                     return;
+                case "a":
                 case "add":
                     await Add.Run(args.Skip(1));
                     break;
+                case "u":
+                case "update":
+                case "upgrade":
+                case "up":
+                    await Upgrade.Run(args.Skip(1));
+                    break;
+                case "r":
                 case "restore":
                     await Restore.Run(args.Skip(1));
                     break;

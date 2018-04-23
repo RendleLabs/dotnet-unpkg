@@ -28,12 +28,7 @@ namespace dotnet_unpkg
 
             foreach (var entry in entries)
             {
-                var jEntry = new JObject
-                {
-                    ["version"] = ExtractVersion(entry.Version),
-                    ["files"] = JArray.FromObject(entry.Files.Select(f =>
-                        new {file = f.Path, cdn = f.CdnUrl, local = f.LocalPath, integrity = f.Integrity}))
-                };
+                var jEntry = CreateSaveObject(entry);
                 file[CleanPackageName(entry.PackageName)] = jEntry;
             }
 
@@ -43,10 +38,68 @@ namespace dotnet_unpkg
             }
         }
 
+        private static JObject CreateSaveObject(UnpkgJsonEntry entry)
+        {
+            var jEntry = new JObject
+            {
+                ["version"] = ExtractVersion(entry.Version),
+                ["files"] = JArray.FromObject(entry.Files.Select(f =>
+                    new {file = f.Path, cdn = f.CdnUrl, local = f.LocalPath, integrity = f.Integrity}))
+            };
+            return jEntry;
+        }
+
+        public static async Task<UnpkgJsonEntry[]> Load()
+        {
+            var file = await LoadJson();
+            return file == null ? Array.Empty<UnpkgJsonEntry>() : Parse(file.Properties()).ToArray();
+        }
+
+        private static IEnumerable<UnpkgJsonEntry> Parse(IEnumerable<JProperty> properties)
+        {
+            return properties.Select(property => new UnpkgJsonEntry
+            {
+                Version = property.Value["version"].Value<string>(),
+                PackageName = property.Name,
+                Files = property.Value["files"].Values<JObject>()
+                    .Select(ParseUnpkgJsonFile).ToList()
+            });
+        }
+
+        private static UnpkgJsonFile ParseUnpkgJsonFile(JObject f)
+        {
+            return new UnpkgJsonFile
+            {
+                Path = f["file"].Value<string>(),
+                CdnUrl = f["cdn"].Value<string>(),
+                LocalPath = f["local"].Value<string>(),
+                Integrity = f["integrity"].Value<string>()
+            };
+        }
+
+        private static async Task<JObject> LoadJson()
+        {
+            if (!File.Exists("unpkg.json")) return default;
+            using (var reader = File.OpenText("unpkg.json"))
+            {
+                var content = await reader.ReadToEndAsync();
+                return JObject.Parse(content);
+            }
+        }
+
         private static string CleanPackageName(string full)
         {
-            var last = full.LastIndexOf('@');
-            return last > 0 ? full.Substring(0, last) : full;
+            var segments = full.Split('/');
+            
+            for (int i = 0, l = segments.Length; i < l; i++)
+            {
+                if (segments[i].IndexOf('@') > 0)
+                {
+                    segments[i] = segments[i].Split('@')[0];
+                }
+            }
+
+            return string.Join('/', segments);
         }
 
         public static string ExtractVersion(string full)

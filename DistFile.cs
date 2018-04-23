@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace dotnet_unpkg
 {
+    [PublicAPI]
     public class DistFile
     {
         public string BaseUrl { get; set; }
@@ -15,5 +17,6 @@ namespace dotnet_unpkg
         public string Integrity { get; set; }
         public List<DistFile> Files { get; set; }
         public string Url { get; set; }
+        public string Version { get; set; }
     }
 }
