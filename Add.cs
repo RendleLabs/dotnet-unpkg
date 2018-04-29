@@ -10,8 +10,7 @@ namespace dotnet_unpkg
     public static class Add
     {
         private static readonly Regex DistInPath = new Regex(@"\/dist\/.*");
-
-        private static readonly string BaseDirectory = Path.Combine("wwwroot", "lib");
+        private static readonly string BaseDirectory = Path.Combine(Settings.Wwwroot, "lib");
 
         public static async Task Run(IEnumerable<string> args)
         {

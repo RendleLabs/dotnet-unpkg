@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace dotnet_unpkg
                 Help.Empty();
                 return;
             }
+            
+            Settings.Initialize(args);
 
             try
             {
@@ -24,7 +27,7 @@ namespace dotnet_unpkg
                     return;
                 case "a":
                 case "add":
-                    await Add.Run(args.Skip(1));
+                    await Add.Run(CleanArguments(args));
                     break;
                 case "u":
                 case "update":
@@ -34,7 +37,7 @@ namespace dotnet_unpkg
                     break;
                 case "r":
                 case "restore":
-                    await Restore.Run(args.Skip(1));
+                    await Restore.Run(CleanArguments(args));
                     break;
                 default:
                     Help.Empty();
@@ -44,6 +47,24 @@ namespace dotnet_unpkg
             catch (Exception exception)
             {
                 Console.WriteLine(exception);
+            }
+        }
+
+        private static IEnumerable<string> CleanArguments(string[] args)
+        {
+            for (int i = 1, l = args.Length; i < l; i++)
+            {
+                if (args[i].StartsWith('-'))
+                {
+                    // --wwwroot=public
+                    if (args[i].Contains('=')) continue;
+                    
+                    // --wwwroot public
+                    i++;
+                    continue;
+                }
+
+                yield return args[i];
             }
         }
     }

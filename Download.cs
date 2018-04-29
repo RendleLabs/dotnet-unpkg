@@ -13,7 +13,7 @@ namespace dotnet_unpkg
         {
             BaseAddress = new Uri("https://unpkg.com")
         };
-        private static readonly string BaseDirectory = Path.Combine("wwwroot", "lib");
+        private static readonly string BaseDirectory = Path.Combine(Settings.Wwwroot, "lib");
         
         public static async Task<(string, string)> DistFile(string package, string path)
         {
