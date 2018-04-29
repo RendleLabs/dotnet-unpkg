@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace dotnet_unpkg
@@ -15,7 +16,7 @@ namespace dotnet_unpkg
                 return;
             }
             
-            Settings.Initialize(args);
+            Settings.Initialize(Flags(args).ToArray());
 
             try
             {
@@ -27,17 +28,17 @@ namespace dotnet_unpkg
                     return;
                 case "a":
                 case "add":
-                    await Add.Run(CleanArguments(args));
+                    await Add.Run(CommandArguments(args));
                     break;
                 case "u":
                 case "update":
                 case "upgrade":
                 case "up":
-                    await Upgrade.Run(args.Skip(1));
+                    await Upgrade.Run(CommandArguments(args));
                     break;
                 case "r":
                 case "restore":
-                    await Restore.Run(CleanArguments(args));
+                    await Restore.Run(CommandArguments(args));
                     break;
                 default:
                     Help.Empty();
@@ -50,7 +51,28 @@ namespace dotnet_unpkg
             }
         }
 
-        private static IEnumerable<string> CleanArguments(string[] args)
+        private static IEnumerable<string> Flags(string[] args)
+        {
+            for (int i = 1, l = args.Length; i < l; i++)
+            {
+                if (args[i].StartsWith('-') || args[i].StartsWith('/'))
+                {
+                    yield return args[i];
+
+                    if (!args[i].Contains('='))
+                    {
+                        if (++i >= args.Length)
+                        {
+                            break;
+                        }
+
+                        yield return args[i];
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<string> CommandArguments(string[] args)
         {
             for (int i = 1, l = args.Length; i < l; i++)
             {
