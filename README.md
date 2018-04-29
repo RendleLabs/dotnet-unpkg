@@ -122,6 +122,17 @@ Aliases for commands:
 - `restore` is also `r`
 - `update` is also `u`, `up` or `upgrade` because I can never remember which one it is
 
+**New in 1.4**
+
+Override where `unpkg` puts your files instead of `wwwroot` by one of:
+
+- JSON config file in `$HOME/.unpkg/unpkg.config`
+- Environment variable `UNPKG_WWWROOT`
+- JSON config file in `./unpkg.config`
+- `--wwwroot=public`
+
+It's using .NET Core Configuration, so each of those will override the previous ones.
+
 ### unpkg.json
 
 The `add` command stores the details about the files it downloaded into a file in the current directory, `unpkg.json`. Once that's there, you can just run
