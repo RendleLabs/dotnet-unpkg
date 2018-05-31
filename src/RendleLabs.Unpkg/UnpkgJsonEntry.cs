@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
+using RendleLabs.Unpkg.Annotations;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     [PublicAPI]
     public class UnpkgJsonEntry
@@ -18,11 +18,11 @@ namespace dotnet_unpkg
                 Version = file.BaseUrl,
                 Files = new List<UnpkgJsonFile>()
             };
-            AddFiles(entry.Files, file.BaseUrl, file.Files);
+            AddFiles(entry.Files, file.Files);
             return entry;
         }
 
-        private static void AddFiles(List<UnpkgJsonFile> files, string version, IEnumerable<DistFile> distFiles)
+        private static void AddFiles(List<UnpkgJsonFile> files, IEnumerable<DistFile> distFiles)
         {
             foreach (var distFile in distFiles)
             {
@@ -38,7 +38,7 @@ namespace dotnet_unpkg
                 }
                 else if (distFile.Files?.Count > 0)
                 {
-                    AddFiles(files, version, distFile.Files);
+                    AddFiles(files, distFile.Files);
                 }
             }
         }

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <_PackageTaskAssembly Condition="'$(MSBuildRuntimeType)' == 'Core'">..\tools\netstandard2.0\RendleLabs.Unpkg.Build.dll</_PackageTaskAssembly>
+        <_PackageTaskAssembly Condition="'$(MSBuildRuntimeType)' != 'Core'">..\tools\net46\RendleLabs.Unpkg.Build.dll</_PackageTaskAssembly>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <BuildDependsOn>
+            UnpkgRestore;
+            $(BuildDependsOn)
+        </BuildDependsOn>
+
+        <CopyAllFilesToSingleFolderForPackageDependsOn>
+            UnpkgRestore;
+            $(CopyAllFilesToSingleFolderForPackageDependsOn);
+        </CopyAllFilesToSingleFolderForPackageDependsOn>
+
+        <CopyAllFilesToSingleFolderForMsdeployDependsOn>
+            UnpkgRestore;
+            $(CopyAllFilesToSingleFolderForMsdeployDependsOn);
+        </CopyAllFilesToSingleFolderForMsdeployDependsOn>
+
+        <CopyFilesToOutputDirectory>
+            UnpkgRestore;
+            $(CopyFilesToOutputDirectory);
+        </CopyFilesToOutputDirectory>
+    </PropertyGroup>
+
+    <UsingTask AssemblyFile="$(_PackageTaskAssembly)" TaskName="RendleLabs.Unpkg.Build.RestoreTask"/>
+
+    <Target Name="UnpkgRestore" Condition="'$(RunUnpkgRestore)' != 'False'">
+
+        <RendleLabs.Unpkg.Build.RestoreTask
+                FileName="unpkg.json"
+                ProjectDirectory="$(MSBuildProjectDirectory)">
+
+            <Output TaskParameter="FilesWritten" ItemName="_FilesWritten"/>
+            
+        </RendleLabs.Unpkg.Build.RestoreTask>
+
+        <ItemGroup>
+            <FilesForPackagingFromProject  Include="%(_FilesWritten.Identity)">
+                <DestinationRelativePath>%(_FilesWritten.Identity)</DestinationRelativePath>
+            </FilesForPackagingFromProject>
+        </ItemGroup>
+    </Target>
+
+</Project>

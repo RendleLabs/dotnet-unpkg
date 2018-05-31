@@ -1,42 +1,54 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg.Build
 {
     public static class Restore
     {
-        public static async Task Run(IEnumerable<string> args)
+        public static Task<RestoreResults> Run()
         {
-            var argList = args.ToList();
-            if (argList.Count > 0 && (argList[0] == "--help" || argList[0] == "-h"))
-            {
-                Help.Restore();
-                return;
-            }
+            return Run(Environment.CurrentDirectory, "unpkg.json");
+        }
 
-            if (!File.Exists("unpkg.json"))
+        public static async Task<RestoreResults> Run(string directory, string unpkgFile)
+        {
+            if (directory == null) throw new ArgumentNullException(nameof(directory));
+            if (unpkgFile == null) throw new ArgumentNullException(nameof(unpkgFile));
+
+            var fullFilePath = Path.Combine(directory, unpkgFile);
+            
+            if (!File.Exists(fullFilePath))
             {
-                Console.Error.WriteLine("No unpkg.json file found in current directory.");
-                return;
+                return new RestoreResults {Error = $"No {unpkgFile} file found in current directory."};
             }
 
             string json;
-            using (var reader = File.OpenText("unpkg.json"))
+            using (var reader = File.OpenText(fullFilePath))
             {
                 json = await reader.ReadToEndAsync();
             }
 
-            var file = JObject.Parse(json);
+            JObject file;
+            try
+            {
+                file = JObject.Parse(json);
+            }
+            catch
+            {
+                return new RestoreResults {Error = $"Error parsing {unpkgFile}."};
+            }
 
-            await Task.WhenAll(file.Properties().Select(p => DownloadFiles((JObject) p.Value)));
+            var allFiles = await Task.WhenAll(file.Properties().Select(p => DownloadFiles((JObject) p.Value)));
+
+            return new RestoreResults {Results = allFiles.SelectMany(f => f).ToArray()};
+            
         }
 
-        private static Task DownloadFiles(JObject entry)
+        private static Task<RestoreResult[]> DownloadFiles(JObject entry)
         {
             var files = (JArray) entry["files"];
 
@@ -44,26 +56,25 @@ namespace dotnet_unpkg
                 .Select(f => DownloadFile((JObject)f)));
         }
 
-        private static Task DownloadFile(JObject file)
+        private static async Task<RestoreResult> DownloadFile(JObject file)
         {
             var local = file["local"]?.Value<string>()?.Replace('/', Path.DirectorySeparatorChar);
             var cdn = file["cdn"]?.Value<string>();
             
             if (string.IsNullOrWhiteSpace(local) || string.IsNullOrWhiteSpace(cdn))
             {
-                Console.Error.WriteLine($"Could not restore: {file}");
-                return Task.CompletedTask;
+                return new RestoreResult {Error = $"Could not restore: {cdn}"};
             }
 
             if (!File.Exists(local)
                 || !TryGetHashAlgorithm(file["integrity"].Value<string>(), out var hashAlgorithm, out var storedHash)
                 || !storedHash.Equals(GetCurrentFileHash(local, hashAlgorithm)))
             {
-                return Download.RestoreDistFile(cdn, local);
+                await Download.RestoreDistFile(cdn, local);
+                return new RestoreResult {CdnUrl = cdn, LocalFile = local};
             }
             
-            Console.WriteLine($"{local} is up-to-date.");
-            return Task.CompletedTask;
+            return new RestoreResult {Message = $"{local} is up-to-date."};
 
         }
         
@@ -79,7 +90,7 @@ namespace dotnet_unpkg
         {
             if (!string.IsNullOrWhiteSpace(integrity))
             {
-                var integrityBits = integrity.Split('-', 2);
+                var integrityBits = integrity.Split(new[]{'-'}, 2);
                 if (integrityBits.Length == 2)
                 {
                     hashAlgorithm = GetAlgorithm(integrityBits[0]);
@@ -107,5 +118,20 @@ namespace dotnet_unpkg
                     return null;
             }
         }
+    }
+
+    public class RestoreResults
+    {
+        public RestoreResult[] Results { get; set; }
+        public string Message { get; set; }
+        public string Error { get; set; }
+    }
+
+    public class RestoreResult
+    {
+        public string LocalFile { get; set; }
+        public string Message { get; set; }
+        public string Error { get; set; }
+        public string CdnUrl { get; set; }
     }
 }

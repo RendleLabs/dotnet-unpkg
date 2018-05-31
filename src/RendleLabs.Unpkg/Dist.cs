@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     public static class Dist
     {
@@ -38,18 +38,18 @@ namespace dotnet_unpkg
             var parts = package.Split('/');
             string sub = null;
 
-            if (package.StartsWith('@') && parts.Length > 1)
+            if (package.StartsWith("@") && parts.Length > 1)
             {
                 package = $"{parts[0]}/{parts[1]}";
                 if (parts.Length > 2)
                 {
-                    sub = string.Join('/', parts.Skip(2));
+                    sub = string.Join("/", parts.Skip(2));
                 }
             }
             else if (parts.Length > 1)
             {
                 package = parts[0];
-                sub = string.Join('/', parts.Skip(1));
+                sub = string.Join("/", parts.Skip(1));
             }
 
             HttpResponseMessage response;

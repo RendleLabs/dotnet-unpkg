@@ -1,7 +1,7 @@
 ﻿using System;
 using Semver;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     public static class VersionComparison
     {

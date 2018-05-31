@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
+using RendleLabs.Unpkg.Annotations;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     [PublicAPI]
     public class DistFile

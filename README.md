@@ -1,4 +1,4 @@
-**NuGet package: [nuget.org/packages/RendleLabs.UnpkgCli](https://www.nuget.org/packages/RendleLabs.UnpkgCli)**
+**NuGet package: [nuget.org/packages/RendleLabs.Unpkg](https://www.nuget.org/packages/RendleLabs.Unpkg)**
 
 # dotnet unpkg
 I got fed up of needing to have Node.js and NPM installed just so I could install
@@ -9,24 +9,27 @@ So I made a `dotnet` command to do it instead.
 
 ## Why should I use it?
 
-Because you're building an ASP.NET Core application which just needs common front-end packages like
-Bootstrap, jQuery and Popper.js, and it's going to serve them from a CDN in Production but with
-fallback to local files. You're not compiling your front-end code with Webpack or anything, and you 
-just want an easy way to acquire those libraries, without needing to install Node.js and NPM or Yarn or Bower,
-and without adding a Gulp or Grunt step just to copy the files you actually need out of `node_modules`.
+Because you're building an ASP.NET Core application which just needs common front-end
+packages like Bootstrap, jQuery and Popper.js, and it's going to serve them from a
+CDN in Production but with fallback to local files. You're not compiling your
+front-end code with Webpack or anything, and you just want an easy way to acquire
+those libraries, without needing to install Node.js and NPM or Yarn or Bower,
+and without adding a Gulp or Grunt step just to copy the files you actually need
+out of `node_modules`.
 
-`dotnet-unpkg` is written in C#, with no dependency on JavaScript runtimes, so it installs as a `dotnet` command
-in your project ([global tool](https://www.natemcmaster.com/blog/2018/02/02/dotnet-global-tool/) support coming soon).
-It'll grab the files you need from the same public CDN you can use for Production
-&mdash; [unpkg.com](https://unpkg.com) &mdash;
-and puts them right into `wwwroot\lib`, where they belong.
+`unpkg` is written in C#, with no dependency on JavaScript runtimes, so it installs
+as a .NET Global Tool. It'll grab the files you need from the same public CDN you can
+use for Production &mdash; [unpkg.com](https://unpkg.com) &mdash; and puts them right
+into `wwwroot\lib`, where they belong.
 
 ## Why shouldn't I use it?
 
-If you are building a complex SPA, with Angular or TypeScript or Webpack or suchlike, and you've got code that loads packages
-from `node_modules` using `import` syntax, then this is not for those projects, and you should use [NPM](https://npmjs.com).
-(You could also use Yarn, but that's by Facebook so for all you know it might be sending copies of your dependency graphs
-to shady data-mining organisations; be careful out there.)
+If you are building a complex SPA, with Angular or TypeScript or Webpack or suchlike,
+and you've got code that loads packages from `node_modules` using `import` syntax,
+then this is not for those projects, and you should use [NPM](https://npmjs.com).
+(You could also use Yarn, but that's by Facebook so for all you know it might be
+sending copies of your dependency graphs to shady data-mining organisations; be
+careful out there.)
 
 ## How does it work?
 
@@ -38,82 +41,80 @@ It also provides metadata about the packages in JSON format, including the `inte
 hash that you can use in your script tags to make sure you're getting the right data
 and the user's connection hasn't been compromised.
 
-`dotnet-unpkg` uses that metadata to discover the files in the package and download
+`unpkg` uses that metadata to discover the files in the package and download
 them right into your `wwwroot/lib` folder.
 
-Sometimes the packages don't have a `dist` folder, in which case `dotnet unpkg` will download pretty much everything.
+Sometimes the packages don't have a `dist` folder, in which case `unpkg` will
+download pretty much everything.
 
 ## Usage
 
-Install the package into your project as a tool reference:
+You'll need the .NET Core SDK 2.1 (currently RC1) installed on your machine.
 
-```xml
-  <ItemGroup>
-    <DotNetCliToolReference Include="RendleLabs.UnpkgCli" Version="1.0.0-*" />
-  </ItemGroup>
+Then you can install the package as a global tool like this:
+
+```bash
+$ dotnet tool install -g --version 2.0.0-rc1 RendleLabs.Unpkg
 ```
 
 Then, from the command line:
 
 ```
-$ dotnet unpkg add vue
+$ unpkg add vue
 ```
 
 It supports NPM-namespaced packages:
 
 ```
-$ dotnet unpkg add @aspnet/signalr
+$ unpkg add @aspnet/signalr
 ```
 
 You can install multiple packages in a single command:
 
 ```
-$ dotnet unpkg add jquery bootstrap popper.js
+$ unpkg add jquery bootstrap popper.js
 ```
 
 If you want a specific version, use the `@` notation:
 
 ```
-$ dotnet unpkg add bootstrap@3.3.7
+$ unpkg add bootstrap@3.3.7
 ```
 
 You can also specify a path within the package, which is a feature I added
 specifically for [Bootswatch](https://bootswatch.com) so I could do this:
 
 ```
-$ dotnet unpkg add bootswatch/yeti
+$ unpkg add bootswatch/yeti
 ```
 That just installs the **Yeti** theme within the larger Bootswatch package. If
 you just install Bootswatch by itself, you'll get all 20-odd themes.
 
-**New in 1.2**
-
-You can now specify paths with namespaced packages. This is incredibly useful if you want to install [Rx.js](http://reactivex.io/rxjs/)
-because it's *huge*, and all you want is the `global` folder:
+You can also specify paths with namespaced packages. This is incredibly useful if you
+want to install [Rx.js](http://reactivex.io/rxjs/) because it's *huge*, and all you
+want is the `global` folder:
 
 ```
-$ dotnet unpkg add @reactivex/rxjs/global
+$ unpkg add @reactivex/rxjs/global
 ```
 And you'll just get the four `<script>`-tag-friendly files that you need, and not the hundreds of Node and Webpack and source files.
-
-**New in 1.3**
 
 Add specific versions using `@` notation, e.g.
 
 ```
-$ dotnet unpkg add jquery@3.3.0
+$ unpkg add jquery@3.3.0
 ```
 
 Update to latest versions of packages with a single command:
 
 ```
-$ dotnet unpkg update
+$ unpkg update
 ```
 
 To update specific packages just add their names, e.g.
 
 ```
-$ dotnet unpkg update bootstrap
+$ unpkg update bootstrap
 ```
 
 Aliases for commands:
@@ -121,8 +122,6 @@ Aliases for commands:
 - `add` is also `a`
 - `restore` is also `r`
 - `update` is also `u`, `up` or `upgrade` because I can never remember which one it is
-
-**New in 1.4**
 
 Override where `unpkg` puts your files instead of `wwwroot` by one of:
 
@@ -135,17 +134,19 @@ It's using .NET Core Configuration, so each of those will override the previous 
 
 ### unpkg.json
 
-The `add` command stores the details about the files it downloaded into a file in the current directory, `unpkg.json`. Once that's there, you can just run
+The `add` command stores the details about the files it downloaded into a file in the
+current directory, `unpkg.json`. Once that's there, you can just run
 
 ```
-dotnet unpkg restore
+$ unpkg restore
 ```
 
 to redownload everything, and it remembers the version, too, so it won't sneakily
 upgrade you to jQuery 4.0 when you're not looking.
 
 If you can get all your `wwwroot/lib` dependencies using `unpkg`, then you can add
-it to your `.gitignore` and save checking all those files in. Just make sure the `unpkg.json` file is checked in.
+it to your `.gitignore` and save checking all those files in. Just make sure the
+`unpkg.json` file is checked in.
 
 Once you've got a package installed, the `restore` command will just use the info
 from `unpkg.json`, so if there are files you don't want you can edit it and remove
@@ -187,7 +188,7 @@ into another file somewhere?
 
 ## Open Source
 
-`dotnet-unpkg` is open source, and incorporates the work of other open source projects, specifically:
+`unpkg` is open source, and incorporates the work of other open source projects, specifically:
 
 - [UNPKG](https://github.com/unpkg) by Michael Jackson
 - [semver](https://github.com/maxhauser/semver) by Max Hauser

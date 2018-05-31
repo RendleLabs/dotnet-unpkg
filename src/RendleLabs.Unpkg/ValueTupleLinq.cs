@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     public static class ValueTupleLinq
     {

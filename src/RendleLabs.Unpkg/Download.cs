@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     public static class Download
     {
@@ -27,27 +27,35 @@ namespace dotnet_unpkg
                 {
                     if (packageSegments.Last() == targetSegments.First())
                     {
-                        target = string.Join(Path.DirectorySeparatorChar, targetSegments.Skip(1));
+                        target = string.Join(Path.DirectorySeparatorChar.ToString(), targetSegments.Skip(1));
                     }
                 }
             }
 
             for (int i = 0; i < packageSegments.Length; i++)
             {
-                if (packageSegments[i].Contains('@') && !packageSegments[i].StartsWith('@'))
+                if (packageSegments[i].Contains('@') && !packageSegments[i].StartsWith("@"))
                 {
                     packageSegments[i] = packageSegments[i].Split('@')[0];
                 }
             }
 
-            package = string.Join('/', packageSegments);
+            package = string.Join("/", packageSegments);
 
             using (var response = await Client.GetAsync(path))
             {
                 if (response.IsSuccessStatusCode)
                 {
                     var file = Path.GetFileName(target);
-                    var directory = Path.Combine(BaseDirectory, package, Path.GetDirectoryName(target));
+                    if (file == null)
+                    {
+                        return (default, default);
+                    }
+
+                    var targetDirectoryName = Path.GetDirectoryName(target);
+                    var directory = targetDirectoryName != null
+                        ? Path.Combine(BaseDirectory, package, targetDirectoryName)
+                        : Path.Combine(BaseDirectory, package);
 
                     if (!Directory.Exists(directory))
                     {
@@ -79,7 +87,7 @@ namespace dotnet_unpkg
                 {
                     path = path.Replace('/', Path.DirectorySeparatorChar);
                     var directory = Path.GetDirectoryName(path);
-                    if (!Directory.Exists(directory))
+                    if (directory != null && !Directory.Exists(directory))
                     {
                         Directory.CreateDirectory(directory);
                     }
@@ -129,7 +137,7 @@ namespace dotnet_unpkg
                 pathParts = pathParts.Skip(1).ToArray();
             }
 
-            return string.Join(Path.DirectorySeparatorChar, pathParts);
+            return string.Join(Path.DirectorySeparatorChar.ToString(), pathParts);
         }
     }
 }

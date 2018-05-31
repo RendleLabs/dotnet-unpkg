@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     public static class Add
     {
@@ -77,7 +77,7 @@ namespace dotnet_unpkg
             var pathSegments = path.Split('/');
             if (basePath.Split('/').LastOrDefault() == pathSegments.FirstOrDefault())
             {
-                path = string.Join('/', pathSegments.Skip(1));
+                path = string.Join("/", pathSegments.Skip(1));
             }
             var (cdn, localPath) = await Download.DistFile(package, $"{basePath}/{path}");
             file.Url = cdn;

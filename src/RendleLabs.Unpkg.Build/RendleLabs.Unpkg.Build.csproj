@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>2.0.0</Version>
+    <PackageTags>library, package, client-side, build</PackageTags>
+    <Authors>Mark Rendle</Authors>
+    <Company>RendleLabs Ltd.</Company>
+    <Description>MSBuild target for RendleLabs UNPKG utility</Description>
+    <Copyright>Copyright © RendleLabs</Copyright>
+    <PackageId>RendleLabs.Unpkg.Build</PackageId>
+    <Title>RendleLabs.Unpkg.Build</Title>
+    <PackageProjectUrl>https://github.com/RendleLabs/Unpkg</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/RendleLabs/Unpkg/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/aspnet/LibraryManager</RepositoryUrl>
+    <PackageOutputPath>..\..\artifacts\$(Configuration)</PackageOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.6.85" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.6.85" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" PrivateAssets="All" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="System.Net.Http" Condition="'$(TargetFramework)' == 'net46'" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="RendleLabs.Unpkg.Build.targets">
+      <Pack>true</Pack>
+      <PackagePath>build</PackagePath>
+    </Content>
+  </ItemGroup>
+    
+  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+    <!--
+    The include needs to happen after output has been copied to build output folder
+    but before NuGet generates a nuspec. See https://github.com/NuGet/Home/issues/4704.
+    -->
+    <ItemGroup>
+      <_PackageFiles Include="bin\$(Configuration)\*\*.Unpkg.dll;bin\$(Configuration)\*\Newtonsoft.Json.dll">
+        <PackagePath>tools\%(RecursiveDir)</PackagePath>
+        <Visible>false</Visible>
+        <BuildAction>Content</BuildAction>
+      </_PackageFiles>
+    </ItemGroup>
+  </Target>
+</Project>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     public static class UnpkgJson
     {
@@ -99,16 +99,16 @@ namespace dotnet_unpkg
                 }
             }
 
-            return string.Join('/', segments);
+            return string.Join("/", segments);
         }
 
         public static string ExtractVersion(string full)
         {
-            var parts = full.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var parts = full.Split(new[]{'/'}, StringSplitOptions.RemoveEmptyEntries);
             var fileAtVersion = parts
                 .FirstOrDefault(s => s[0] != '@' && s.Contains('@'));
             if (fileAtVersion == null) return parts[0];
-            parts = fileAtVersion.Split('@', 2, StringSplitOptions.RemoveEmptyEntries);
+            parts = fileAtVersion.Split(new[]{'@'}, 2, StringSplitOptions.RemoveEmptyEntries);
             return parts[1];
         }
     }

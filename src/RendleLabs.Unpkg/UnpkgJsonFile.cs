@@ -1,4 +1,4 @@
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     public class UnpkgJsonFile
     {

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using RendleLabs.Unpkg;
 
 namespace dotnet_unpkg
 {
@@ -26,6 +28,9 @@ namespace dotnet_unpkg
                 case "-h":
                     Help.Empty();
                     return;
+                case "--add-task":
+                    AddBuildTask();
+                    return;
                 case "a":
                 case "add":
                     await Add.Run(CommandArguments(args));
@@ -38,7 +43,8 @@ namespace dotnet_unpkg
                     break;
                 case "r":
                 case "restore":
-                    await Restore.Run(CommandArguments(args));
+                    var results = await Restore.Run(CommandArguments(args));
+                    WriteRestoreResults(results);
                     break;
                 default:
                     Help.Empty();
@@ -48,6 +54,40 @@ namespace dotnet_unpkg
             catch (Exception exception)
             {
                 Console.WriteLine(exception);
+            }
+        }
+
+        private static void AddBuildTask()
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = "add package RendleLabs.Unpkg.Build",
+                UseShellExecute = false,
+                LoadUserProfile = true
+            };
+            Process.Start(psi)?.WaitForExit();
+        }
+
+        private static void WriteRestoreResults(RestoreResults results)
+        {
+            if (!string.IsNullOrEmpty(results.Message))
+            {
+                Console.WriteLine(results.Message);
+            }
+            else
+            {
+                foreach (var result in results.Results)
+                {
+                    if (!string.IsNullOrEmpty(result.Message))
+                    {
+                        Console.WriteLine(result.Message);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{result.CdnUrl} -> {result.LocalFile}");
+                    }
+                }
             }
         }
 

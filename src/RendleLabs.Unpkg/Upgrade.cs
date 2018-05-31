@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace dotnet_unpkg
+namespace RendleLabs.Unpkg
 {
     public static class Upgrade
     {
