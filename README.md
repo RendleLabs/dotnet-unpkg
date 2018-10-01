@@ -49,12 +49,12 @@ download pretty much everything.
 
 ## Usage
 
-You'll need the .NET Core SDK 2.1 (currently RC1) installed on your machine.
+You'll need the .NET Core SDK 2.1 installed on your machine.
 
 Then you can install the package as a global tool like this:
 
 ```bash
-$ dotnet tool install -g --version 2.0.0-rc1 RendleLabs.Unpkg
+$ dotnet tool install -g --version 2.0.0 RendleLabs.UnpkgCli
 ```
 
 Then, from the command line:
@@ -122,6 +122,9 @@ Aliases for commands:
 - `add` is also `a`
 - `restore` is also `r`
 - `update` is also `u`, `up` or `upgrade` because I can never remember which one it is
+
+If you want to restore files as part of your build, you can install the [`RendleLabs.Unpkg.Build`](https://www.nuget.org/packages/RendleLabs.Unpkg.Build/) NuGet package.
+Alternatively, after installing the CLI tool, you can `unpkg --add-task` to achieve the same result.
 
 Override where `unpkg` puts your files instead of `wwwroot` by one of:
 

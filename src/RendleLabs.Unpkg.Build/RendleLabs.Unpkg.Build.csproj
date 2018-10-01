@@ -10,8 +10,8 @@
     <Copyright>Copyright © RendleLabs</Copyright>
     <PackageId>RendleLabs.Unpkg.Build</PackageId>
     <Title>RendleLabs.Unpkg.Build</Title>
-    <PackageProjectUrl>https://github.com/RendleLabs/Unpkg</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/RendleLabs/Unpkg/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/RendleLabs/dotnet-unpkg</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/RendleLabs/dotnet-unpkg/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/aspnet/LibraryManager</RepositoryUrl>
     <PackageOutputPath>..\..\artifacts\$(Configuration)</PackageOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
